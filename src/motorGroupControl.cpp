@@ -11,6 +11,7 @@ void waitForMovementToFinish(bool waitForChain=true, bool waitForLift=true, unsi
 		if ((!chainBar.errorLessThan(chainMargin) && waitForChain) ||
 				(!lift.errorLessThan(liftMargin) && waitForLift))
 			movementTimer.reset();
+		delay(5);
 	}
 }
 

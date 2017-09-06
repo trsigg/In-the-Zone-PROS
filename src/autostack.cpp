@@ -1,46 +1,60 @@
+#include <API.h>
 #include "motorGroupControl.h"
 #include "motorGroup.h"
 
-#define INTAKE_DURATION 300	//amount of time rollers activate when intaking/expelling
-
 int numCones = 0; //current number of stacked cones
 bool stacking = false;	//whether the robot is currently in the process of stacking
-double liftAngle;	//the target angles of lift sections during a stack mane
+double liftAngle1;	//the target angles of lift sections during a stack maneuver
+double liftAngle2;
 double chainAngle;
 
 
+double firstLiftPositions[] =		{  };
+double secondLiftPositions[] =	{  };
+double chainPositions[] =				{  };
+
+
 void stackNewCone() {	//TODO: account for limited range of motion
-	double adjustedHeight = CONE_HEIGHT * numCones - LIFT_BASE_HEIGHT;
+	#ifdef MATH
+	double y = CONE_HEIGHT * numCones - LIFT_BASE_HEIGHT;
+	double x = STACK_X_POS;
 
 	if (DR4B) {
-		chainAngle = acos(STACK_X_POS / CHAIN_LEN);
-		liftAngle = asin((adjustedHeight - CHAIN_LEN * sin(chainAngle)) / LIFT_LEN / 2);
+		chainAngle = acos(x / CHAIN_LEN);
+		liftAngle1 = asin((y - CHAIN_LEN * sin(chainAngle)) / LIFT_LEN / 2);
 	}
 	else {
 		double sqrLen1 = pow(LIFT_LEN, 2);
 		double sqrLen2 = pow(CHAIN_LEN, 2);
-		double a = pow(STACK_X_POS, 2) + pow(adjustedHeight, 2);
-		double b = a + sqrLen1 - sqrLen2;
-		double r = sqrt(2 * sqrLen1 * (sqrLen2 + b) - pow(LIFT_LEN, 4) - pow(b - sqrLen2, 2));
+		double a = pow(x, 2) + pow(y, 2);
+		double b = sqrLen1 - sqrLen2;
+		double c = sqrLen1 * sqrt(2 * (a + sqrLen2) - pow(a - sqrLen2, 2) - sqrLen1);
 
-		liftAngle = atan(adjustedHeight * (adjustedHeight * a + STACK_X_POS * r) /
-														(STACK_X_POS * a + adjustedHeight * r));
-		chainAngle = acos((STACK_X_POS - LIFT_LEN * cos(liftAngle)) / CHAIN_LEN);
+		chainAngle = atan((y * (a - b) - x * c) / (x * (a - b) + y * c));
+		liftAngle2 = acos((CHAIN_LEN * cos(chainAngle) - x) / LIFT_LEN);
 	}
+
+	liftAngle1 = liftAngle2 + LIFT_OFFSET;
+	#else
+	liftAngle1 = firstLiftPositions[numCones];
+	liftAngle2 = secondLiftPositions[numCones];
+	chainAngle = chainPositions[numCones];
+	#endif
 
 	stacking = true;
 }
 
-void liftManeuvers() {	//TODO: TASKIFY
+void liftManeuversTask(void* ignore) {
 	while (true) {
 		chainBar.maintainTargetPos();
 		lift.maintainTargetPos();
+		delay(LIFT_SAMPLE_TIME);
 	}
 }
 
-void autoStacking() {	//TODO: taskify
+void autoStackingTask(void* ignore) {
 	while (true) {
-		while (!stacking);
+		while (!stacking) delay(5);
 
 		//intake cone
 		coneIntake.setPower(127);
@@ -49,11 +63,13 @@ void autoStacking() {	//TODO: taskify
 
 		//move to desired location
 		setChainBarState(SAFE);
-		lift.setTargetPosition(liftAngle);
+		lift.setTargetPosition(liftAngle1);
 
-		while (liftHeight() < numCones * CONE_HEIGHT + CHAIN_BAR_OFFSET);
+		while (liftHeight() < numCones * CONE_HEIGHT + CHAIN_BAR_OFFSET) delay(5);
 		chainBar.setTargetPosition(chainAngle);
+		waitForMovementToFinish();
 
+		lift.setTargetPosition(liftAngle2);
 		waitForMovementToFinish();
 
 		//expel cone
@@ -70,4 +86,17 @@ void autoStacking() {	//TODO: taskify
 
 		setChainBarState(CH_DEF);
 	}
+}
+
+TaskHandle liftManeuvers;
+TaskHandle autoStacking;
+
+void startStackingTasks() {
+	liftManeuvers = taskCreate(liftManeuversTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+	autoStacking = taskCreate(autoStackingTask, TASK_DEFAULT_STACK_SIZE, NULL, TASK_PRIORITY_DEFAULT);
+}
+
+void stopStackingTasks() {
+	taskDelete(liftManeuvers);
+	taskDelete(autoStacking);
 }

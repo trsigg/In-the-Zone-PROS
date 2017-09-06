@@ -3,8 +3,7 @@
 
 
 void operatorControl() {
-  //startTask(liftManeuvers);
-	//startTask(autoStacking);
+  startStackingTasks();
 
 	while (true) {
 		if (!stacking && joystickGetDigital(FRONT_STACK_BTN))

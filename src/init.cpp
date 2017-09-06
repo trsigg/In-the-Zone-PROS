@@ -15,7 +15,7 @@ void initialize() {
   goalIntake.addSensor(GOAL_INTAKE_ENC);
   //#endregion
   //#region PID config
-  lift.posPIDinit(0.3, 0.01, 0.05);
-  chainBar.posPIDinit(0.2, 0.001, 0.05);
+  lift.posPIDinit(0.3, 0.01, 0.05, 0);
+  chainBar.posPIDinit(0.2, 0.001, 0.05, 0);
   //#endregion
 }

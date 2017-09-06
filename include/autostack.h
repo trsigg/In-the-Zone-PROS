@@ -6,7 +6,7 @@
 extern bool stacking;
 
 void stackNewCone();
-void liftManeuvers();
-void autoStacking();
+void startStackingTasks();
+void stopStackingTasks();
 
 #endif

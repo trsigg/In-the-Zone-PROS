@@ -19,6 +19,7 @@
   //#endsubregion
   //#subregion config
   #define DR4B false	//true if using double reverse as primary lift
+  //#define MATH  //defined if using mathematical model for autostacking (as opposed to hand-tuned ovement)
   //#endsubregion
   //#subregion drive
   //motors (mps = motor ports)
@@ -41,7 +42,7 @@
   #define LIFT_MAX_ANGLE  61.3
   #define LIFT_LEN        15.0  //inches
   //positions
-  enum liftState		{ L_DEF };
+  enum liftState		{ L_ZERO };
   #define LIFT_POS  { -30 }
   //#endsubregion
   //#subregion chain bar
@@ -54,7 +55,7 @@
   #define CHAIN_MAX_ANGLE 71.3
   #define CHAIN_LEN       16.5  //inches
   //positions
-  enum chainState 	{ CH_DEF,	SAFE };	//when chain bar is SAFE, lift can move up and down without colliding with cone stack
+  enum chainState 	{ CH_DEF,	CH_ZERO };	//when chain bar is SAFE, lift can move up and down without colliding with cone stack
   #define CHAIN_POS { -10,		0 }
   //#endsubregion
   //#subregion cone intake
@@ -83,6 +84,11 @@
   #define STACK_X_POS -5	//horizontal distance of cone stack from base of lift
   #define STACK_OFFSET 7	//distance above stack cone must be to be added (because of height of cones, etc.)
   #define CHAIN_BAR_OFFSET -1	//offset from the top of the cone stack when chain bar starts rotating from angle 0 to its final position (to avoid collision)
+  #define LIFT_OFFSET 10 //amount lift overshoots before coming down to place cone
+  //#endsubregion
+  //#subregion timing
+  #define LIFT_SAMPLE_TIME 30 //sample time for lift PID's
+  #define INTAKE_DURATION 300	//amount of time rollers activate when intaking/expelling
   //#endsubregion
   //#subregion global externs
   extern ParallelDrive drive; //TODO: move?
