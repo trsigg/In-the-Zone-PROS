@@ -9,39 +9,41 @@ double liftAngle2;
 double chainAngle;
 
 
-double firstLiftPositions[] =		{  };
-double secondLiftPositions[] =	{  };
-double chainPositions[] =				{  };
+double liftStackPositions[MAX_NUM_CONES] = L_STACK_POS;
+double liftStackOffsets[MAX_NUM_CONES] = L_STACK_OFF;	//offsets from stack positions
+double chainPositions[MAX_NUM_CONES] = CH_STACK_POS;
 
 
-void stackNewCone() {	//TODO: account for limited range of motion
-	#ifdef MATH
-	double y = CONE_HEIGHT * numCones - LIFT_BASE_HEIGHT;
-	double x = STACK_X_POS;
+void stackNewCone() {
+	if (numCones < MAX_NUM_CONES) {
+		#ifdef MATH	//TODO: account for limited range of motion
+		double y = CONE_HEIGHT * numCones - LIFT_BASE_HEIGHT;
+		double x = STACK_X_POS;
 
-	if (DR4B) {
-		chainAngle = acos(x / CHAIN_LEN);
-		liftAngle1 = asin((y - CHAIN_LEN * sin(chainAngle)) / LIFT_LEN / 2);
+		if (DR4B) {
+			chainAngle = acos(x / CHAIN_LEN);
+			liftAngle1 = asin((y - CHAIN_LEN * sin(chainAngle)) / LIFT_LEN / 2);
+		}
+		else {
+			double sqrLen1 = pow(LIFT_LEN, 2);
+			double sqrLen2 = pow(CHAIN_LEN, 2);
+			double a = pow(x, 2) + pow(y, 2);
+			double b = sqrLen1 - sqrLen2;
+			double c = sqrLen1 * sqrt(2 * (a + sqrLen2) - pow(a - sqrLen2, 2) - sqrLen1);
+
+			chainAngle = atan((y * (a - b) - x * c) / (x * (a - b) + y * c));
+			liftAngle2 = acos((CHAIN_LEN * cos(chainAngle) - x) / LIFT_LEN);
+		}
+
+		liftAngle1 = liftAngle2 + L_DEF_OFF;
+		#else
+		liftAngle2 = liftStackPositions[numCones];
+		liftAngle1 = liftAngle2 + liftStackOffsets[numCones];
+		chainAngle = chainPositions[numCones];
+		#endif
+
+		stacking = true;
 	}
-	else {
-		double sqrLen1 = pow(LIFT_LEN, 2);
-		double sqrLen2 = pow(CHAIN_LEN, 2);
-		double a = pow(x, 2) + pow(y, 2);
-		double b = sqrLen1 - sqrLen2;
-		double c = sqrLen1 * sqrt(2 * (a + sqrLen2) - pow(a - sqrLen2, 2) - sqrLen1);
-
-		chainAngle = atan((y * (a - b) - x * c) / (x * (a - b) + y * c));
-		liftAngle2 = acos((CHAIN_LEN * cos(chainAngle) - x) / LIFT_LEN);
-	}
-
-	liftAngle1 = liftAngle2 + LIFT_OFFSET;
-	#else
-	liftAngle1 = firstLiftPositions[numCones];
-	liftAngle2 = secondLiftPositions[numCones];
-	chainAngle = chainPositions[numCones];
-	#endif
-
-	stacking = true;
 }
 
 void liftManeuversTask(void* ignore) {
@@ -57,16 +59,14 @@ void autoStackingTask(void* ignore) {
 		while (!stacking) delay(5);
 
 		//intake cone
+		setChainBarState(CH_INTAKE)
 		coneIntake.setPower(127);
 		delay(INTAKE_DURATION);
 		coneIntake.setPower(CONE_STILL_SPEED);
 
 		//move to desired location
-		setChainBarState(SAFE);
-		lift.setTargetPosition(liftAngle1);
-
-		while (liftHeight() < numCones * CONE_HEIGHT + CHAIN_BAR_OFFSET) delay(5);
 		chainBar.setTargetPosition(chainAngle);
+		lift.setTargetPosition(liftAngle1);
 		waitForMovementToFinish();
 
 		lift.setTargetPosition(liftAngle2);
@@ -78,13 +78,8 @@ void autoStackingTask(void* ignore) {
 		coneIntake.setPower(0);
 
 		//return to ready positions
-		setChainBarState(SAFE);
-		waitForMovementToFinish(true, false);
-
-		setLiftState(L_DEF);
-		waitForMovementToFinish(false);
-
 		setChainBarState(CH_DEF);
+		setLiftState(L_BOTTOM);
 	}
 }
 

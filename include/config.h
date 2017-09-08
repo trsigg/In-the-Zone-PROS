@@ -17,14 +17,17 @@
   #include "parallelDrive.h"
   #include "buttonGroup.h"
   //#endsubregion
+  //#subregion constants
+  #define MAX_NUM_CONES 12
+  //#endsubregion
   //#subregion config
   #define DR4B false	//true if using double reverse as primary lift
   //#define MATH  //defined if using mathematical model for autostacking (as opposed to hand-tuned ovement)
   //#endsubregion
   //#subregion drive
   //motors (mps = motor ports)
-  #define LD_MPS  { 1, 2 }   //left
-  #define RD_MPS  { 9, 10 }  //right
+  #define LD_MPS  { 9, 10 }   //left
+  #define RD_MPS  { 1, 2 }  //right
   //sensors
   #define HYRO      1
   #define RIGHT_ENC 4, 3, false
@@ -34,7 +37,7 @@
   //#endsubregion
   //#subregion lift
   //motors
-  #define LIFT_MPS  { 4, 5 }  //total guess
+  #define LIFT_MPS  { 5 }
   //sensors
   #define LIFT_POT  2
   //dimensions
@@ -42,12 +45,16 @@
   #define LIFT_MAX_ANGLE  61.3
   #define LIFT_LEN        15.0  //inches
   //positions
-  enum liftState		{ L_ZERO };
-  #define LIFT_POS  { -30 }
+  enum liftState		{ L_BOTTOM, L_PRELOAD };
+  #define LIFT_POS  { -30,      10 }
+  //autostacking offsets
+  #define L_DEF_OFF 200
+  #define L_STACK_POS { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+  #define L_STACK_OFF { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
   //#endsubregion
   //#subregion chain bar
   //motors
-  #define CHAIN_MPS { 3, 8 }  //guess
+  #define CHAIN_MPS { 6 }
   //sensors
   #define CHAIN_ENC 6, 5, false
   //dimensions
@@ -55,18 +62,20 @@
   #define CHAIN_MAX_ANGLE 71.3
   #define CHAIN_LEN       16.5  //inches
   //positions
-  enum chainState 	{ CH_DEF,	CH_ZERO };	//when chain bar is SAFE, lift can move up and down without colliding with cone stack
-  #define CHAIN_POS { -10,		0 }
+  enum chainState 	{ CH_DEF,	CH_INTAKE };
+  #define CHAIN_POS { -600,		-625 }
+  //autostacking offsets
+  #define CH_STACK_POS { 708, 706, 599, 636, 620, 722, 635, 560, 533, 529, 528, 530 } //{ 1, 19, -62, -103, -15, -66, -39, -157, -146, -193 }
   //#endsubregion
   //#subregion cone intake
   //motors
-  #define CONE_INTAKE_MPS { 6 }
+  #define CONE_INTAKE_MPS { 7 }
   //motor powers
   #define CONE_STILL_SPEED  10
   //#endsubregion
   //#subregion mobile goal intake
   //motors
-  #define GOAL_INTAKE_MPS { 7 }  //total guess
+  #define GOAL_INTAKE_MPS { 3, 8 }
   //sensors
   #define GOAL_INTAKE_ENC 3
   //input
