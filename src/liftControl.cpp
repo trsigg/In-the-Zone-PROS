@@ -1,7 +1,26 @@
 #include <API.h>
-#include "motorGroupControl.h"
+#include "config.h"
 #include "motorGroup.h"
+#include "timer.h"
 
+
+double liftHeight() {
+	return LIFT_BASE_HEIGHT + LIFT_LEN * sin(lift.getPosition()) * (DR4B ? 2 : 1);
+}
+
+void waitForMovementToFinish(bool waitForChain=true, bool waitForLift=true, unsigned short timeout=75, double chainMargin=7, double liftMargin=10) {
+	Timer movementTimer;
+
+	while (movementTimer.time() < timeout) {
+		if ((!chainBar.errorLessThan(chainMargin) && waitForChain) ||
+				(!lift.errorLessThan(liftMargin) && waitForLift))
+			movementTimer.reset();
+		delay(5);
+	}
+}
+
+
+//#region stacking
 int numCones = 0; //current number of stacked cones
 bool stacking = false;	//whether the robot is currently in the process of stacking
 double liftAngle1;	//the target angles of lift sections during a stack maneuver
@@ -106,3 +125,4 @@ void stopStackingTasks() {
 	taskDelete(liftManeuvers);
 	taskDelete(autoStacking);
 }
+//#endregion

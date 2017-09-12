@@ -1,12 +1,17 @@
 #ifndef AUTOSTACK_INCLUDED
 #define AUTOSTACK_INCLUDED
 
-#include "motorGroupControl.h"
 
+double liftHeight();
+
+
+//#region autostacking
 extern bool stacking;
+extern int numCones;
 
 void stackNewCone();
 void startStackingTasks();
 void stopStackingTasks();
+//#endregion
 
 #endif

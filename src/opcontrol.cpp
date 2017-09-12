@@ -1,5 +1,6 @@
 #include "main.h"
-#include "autostack.h"
+#include "config.h"
+#include "liftControl.h"
 
 
 void operatorControl() {
