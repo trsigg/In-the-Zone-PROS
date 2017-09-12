@@ -11,8 +11,7 @@
 //#endregion
 
 
-//#region E-Team
-#ifdef E_TEAM
+//#region default config
   //#subregion includes
   #include "parallelDrive.h"
   #include "buttonGroup.h"
@@ -22,6 +21,7 @@
   //#endsubregion
   //#subregion config
   #define DR4B false	//true if using double reverse as primary lift
+  #define TESTING 2 //0 for normal behavior, 1 for sensor testing, 2 for test bot
   //#define MATH  //defined if using mathematical model for autostacking (as opposed to hand-tuned ovement)
   //#endsubregion
   //#subregion drive
@@ -66,7 +66,7 @@
   #define CH_INTAKE 71
   #define CH_VERT 340
   //autostacking offsets
-  #define CH_STACK_POS { 694, 619, 563, 629, 624, 672, 709, 653, 600, 503, 537 } //{ 1, 19, -62, -103, -15, -66, -39, -157, -146, -193 }
+  #define CH_STACK_POS { 694, 619, 563, 629, 624, 672, 709, 653, 600, 503, 537 }
   //#endsubregion
   //#subregion cone intake
   //motors
@@ -107,7 +107,6 @@
   extern MotorGroup coneIntake;
   extern ButtonGroup goalIntake;
   //#endsubregion
-#endif
 //#endregion
 
 #endif

@@ -69,8 +69,8 @@ void liftManeuversTask(void* ignore) {
 	while (true) {
 		chainBar.maintainTargetPos();
 		lift.maintainTargetPos();
-		printf("CB: %d", chainBar.getPosition());
-		printf("LI: %d", lift.getPosition());
+		/* printf("CB: %d", chainBar.getPosition());
+		printf("LI: %d", lift.getPosition()); */
 		delay(LIFT_SAMPLE_TIME);
 	}
 }

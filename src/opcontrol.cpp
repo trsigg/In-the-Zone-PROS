@@ -1,9 +1,12 @@
 #include "main.h"
 #include "config.h"
 #include "liftControl.h"
+#include "testing.h"
 
 
 void operatorControl() {
+  handleTesting();
+  
   startStackingTasks();
 
 	while (true) {
