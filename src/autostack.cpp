@@ -50,6 +50,8 @@ void liftManeuversTask(void* ignore) {
 	while (true) {
 		chainBar.maintainTargetPos();
 		lift.maintainTargetPos();
+		printf("CB: %d", chainBar.getPosition());
+		printf("LI: %d", lift.getPosition());
 		delay(LIFT_SAMPLE_TIME);
 	}
 }
@@ -59,27 +61,36 @@ void autoStackingTask(void* ignore) {
 		while (!stacking) delay(5);
 
 		//intake cone
-		setChainBarState(CH_INTAKE)
+		chainBar.setTargetPosition(CH_INTAKE);
 		coneIntake.setPower(127);
+		//while (!chainBar.errorLessThan(5)) delay(5);
 		delay(INTAKE_DURATION);
 		coneIntake.setPower(CONE_STILL_SPEED);
 
 		//move to desired location
-		chainBar.setTargetPosition(chainAngle);
+		chainBar.setTargetPosition(CH_VERT);
 		lift.setTargetPosition(liftAngle1);
-		waitForMovementToFinish();
+		waitForMovementToFinish(false);
 
-		lift.setTargetPosition(liftAngle2);
+		chainBar.setTargetPosition(chainAngle);
+
+		if (liftAngle1 != liftAngle2) {
+			waitForMovementToFinish(true, false);
+			lift.setTargetPosition(liftAngle2);
+		}
+
 		waitForMovementToFinish();
 
 		//expel cone
 		coneIntake.setPower(-127);
+		chainBar.setTargetPosition(CH_DEF);
 		delay(INTAKE_DURATION);
 		coneIntake.setPower(0);
 
-		//return to ready positions
-		setChainBarState(CH_DEF);
-		setLiftState(L_BOTTOM);
+		while (chainBar.getPosition() > CH_VERT) delay(5);	//wait for chain bar to clear stack
+
+		//lift down
+		lift.setTargetPosition(L_BOTTOM);
 	}
 }
 

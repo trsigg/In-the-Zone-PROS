@@ -18,7 +18,7 @@
   #include "buttonGroup.h"
   //#endsubregion
   //#subregion constants
-  #define MAX_NUM_CONES 12
+  #define MAX_NUM_CONES 11
   //#endsubregion
   //#subregion config
   #define DR4B false	//true if using double reverse as primary lift
@@ -39,18 +39,18 @@
   //motors
   #define LIFT_MPS  { 5 }
   //sensors
-  #define LIFT_POT  2
+  #define LIFT_POT  2, true
   //dimensions
   #define LIFT_MIN_ANGLE  -42.0 //degrees
   #define LIFT_MAX_ANGLE  61.3
   #define LIFT_LEN        15.0  //inches
   //positions
-  enum liftState		{ L_BOTTOM, L_PRELOAD };
-  #define LIFT_POS  { -30,      10 }
+  #define L_BOTTOM 3450
+  #define L_PRELOAD 2450
   //autostacking offsets
   #define L_DEF_OFF 200
-  #define L_STACK_POS { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-  #define L_STACK_OFF { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+  #define L_STACK_POS { 2960, 3090, 3145, 2735, 2645, 2340, 2085, 1990, 2130, 1830, 1900 }
+  #define L_STACK_OFF { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
   //#endsubregion
   //#subregion chain bar
   //motors
@@ -62,16 +62,17 @@
   #define CHAIN_MAX_ANGLE 71.3
   #define CHAIN_LEN       16.5  //inches
   //positions
-  enum chainState 	{ CH_DEF,	CH_INTAKE };
-  #define CHAIN_POS { -600,		-625 }
+  #define CH_DEF 150
+  #define CH_INTAKE 71
+  #define CH_VERT 340
   //autostacking offsets
-  #define CH_STACK_POS { 708, 706, 599, 636, 620, 722, 635, 560, 533, 529, 528, 530 } //{ 1, 19, -62, -103, -15, -66, -39, -157, -146, -193 }
+  #define CH_STACK_POS { 694, 619, 563, 629, 624, 672, 709, 653, 600, 503, 537 } //{ 1, 19, -62, -103, -15, -66, -39, -157, -146, -193 }
   //#endsubregion
   //#subregion cone intake
   //motors
   #define CONE_INTAKE_MPS { 7 }
   //motor powers
-  #define CONE_STILL_SPEED  10
+  #define CONE_STILL_SPEED  10  //TODO: still speed
   //#endsubregion
   //#subregion mobile goal intake
   //motors

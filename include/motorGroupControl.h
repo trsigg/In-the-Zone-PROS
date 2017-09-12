@@ -6,12 +6,7 @@
 void waitForMovementToFinish(bool waitForChain=true, bool waitForLift=true, unsigned short timeout=75, double chainMargin=7, double liftMargin=10);
 
 //#region lift
-void setLiftState(liftState state);
 double liftHeight();
-//#endregion
-
-//#region chain bar
-void setChainBarState(chainState state);
 //#endregion
 
 #endif
