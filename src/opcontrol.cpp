@@ -6,11 +6,11 @@
 
 void operatorControl() {
   handleTesting();
-  
+
   startStackingTasks();
 
 	while (true) {
-		if (!stacking && joystickGetDigital(FRONT_STACK_BTN)) {
+		if (!stacking && joystickGetDigital(STACK_BTN)) {
 			stackNewCone();
       printf("wtf");
     }

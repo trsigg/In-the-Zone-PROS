@@ -20,9 +20,7 @@
   #define MAX_NUM_CONES 11
   //#endsubregion
   //#subregion config
-  #define DR4B false	//true if using double reverse as primary lift
   #define TESTING 2 //0 for normal behavior, 1 for sensor testing, 2 for test bot
-  //#define MATH  //defined if using mathematical model for autostacking (as opposed to hand-tuned ovement)
   //#endsubregion
   //#subregion drive
   //motors (mps = motor ports)
@@ -39,65 +37,48 @@
   //motors
   #define LIFT_MPS  { 5 }
   //sensors
-  #define LIFT_POT  2, true
+  #define L_POS_SENSOR  2, true
   //dimensions
-  #define LIFT_MIN_ANGLE  -42.0 //degrees
-  #define LIFT_MAX_ANGLE  61.3
-  #define LIFT_LEN        15.0  //inches
+  #define LIFT_LEN 15
   //positions
-  #define L_BOTTOM 3450
-  #define L_PRELOAD 2450
-  //autostacking offsets
-  #define L_DEF_OFF 200
-  #define L_STACK_POS { 2960, 3090, 3145, 2735, 2645, 2340, 2085, 1990, 2130, 1830, 1900 }
-  #define L_STACK_OFF { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+  enum liftState { L_DEF, L_ZERO, PRELOAD, M_BASE_POS, S_BASE_POS };
+  #define L_POS  { 3450,  2000,   2450,    3450,       2000 }
   //#endsubregion
   //#subregion chain bar
   //motors
   #define CHAIN_MPS { 6 }
   //sensors
-  #define CHAIN_ENC 6, 5, false
-  //dimensions
-  #define CHAIN_MIN_ANGLE -53.8 //degrees
-  #define CHAIN_MAX_ANGLE 71.3
-  #define CHAIN_LEN       16.5  //inches
+  #define CH_POS_SENSOR 6, 5, false
   //positions
-  #define CH_DEF 150
-  #define CH_INTAKE 71
-  #define CH_VERT 340
-  //autostacking offsets
-  #define CH_STACK_POS { 694, 619, 563, 629, 624, 672, 709, 653, 600, 503, 537 }
+  enum chainState { CH_DEF,	INTAKE, SAFE, STACK };	//when chain bar is SAFE, lift can move up and down without colliding with cone stack
+  #define CH_POS  { 150,     71,     340,  500 }
   //#endsubregion
   //#subregion cone intake
   //motors
   #define CONE_INTAKE_MPS { 7 }
   //motor powers
-  #define CONE_STILL_SPEED  10  //TODO: still speed
+  #define CONE_STILL_SPEED  10
   //#endsubregion
   //#subregion mobile goal intake
   //motors
   #define GOAL_INTAKE_MPS { 3, 8 }
   //sensors
-  #define GOAL_INTAKE_ENC 3
+  #define GOAL_POS_SENSOR 3
   //input
   #define GOAL_BTN_GROUP    7
   #define GOAL_BTN_CONFIG   5
   #define GOAL_STILL_SPEED  0
   //#endsubregion
   //#subregion autostacking controls
-  #define FRONT_STACK_BTN 1, 6, JOY_UP
-  #define BACK_STACK_BTN  1, 6, JOY_DOWN
+  #define STACK_BTN 1, 6, JOY_UP
   //#endsubregion
   //#subregion measurements
   #define CONE_HEIGHT 1  //amount of stack height increase per cone
-  #define LIFT_BASE_HEIGHT 22	//height of end actuator when all linkage joints are at angle 0 (above top of mobile goal)
-  #define STACK_X_POS -5	//horizontal distance of cone stack from base of lift
-  #define STACK_OFFSET 7	//distance above stack cone must be to be added (because of height of cones, etc.)
-  #define CHAIN_BAR_OFFSET -1	//offset from the top of the cone stack when chain bar starts rotating from angle 0 to its final position (to avoid collision)
-  #define LIFT_OFFSET 10 //amount lift overshoots before coming down to place cone
+  #define RAD_TO_POT 880.1
+  #define LIFT_BASE_HEIGHT 0
   //#endsubregion
   //#subregion timing
-  #define LIFT_SAMPLE_TIME 30 //sample time for lift PID's
+  #define LIFT_SAMPLE_TIME 30 //sample time for lift PIDs
   #define INTAKE_DURATION 300	//amount of time rollers activate when intaking/expelling
   //#endsubregion
   //#subregion global externs
@@ -107,6 +88,28 @@
   extern MotorGroup coneIntake;
   extern ButtonGroup goalIntake;
   //#endsubregion
+//#endregion
+//#region X team
+#ifdef X_TEAM
+  //#subregion lift
+  //motors
+  #define LIFT_MPS  { 6, 4 }
+  //sensors
+  #define L_POS_SENSOR  1
+  //positons
+             // { L_DEF, L_ZERO, PRELOAD, M_BASE_POS, S_BASE_POS };
+  #define L_POS { 3450,  2000,   2450,    3450,       2000 };
+  //#endsubregion
+  //#subregion chain bar
+  //motors
+  #define CHAIN_MPS { 5 }
+  //sensors
+  #define CH_POS_SENSOR 8
+  //positions
+              // { CH_DEF, INTAKE, SAFE, STACK };	//when chain bar is SAFE, lift can move up and down without colliding with cone stack
+  #define CH_POS  { 150,     71,     340,  500 };
+  //#endsubregion
+#endif
 //#endregion
 
 #endif

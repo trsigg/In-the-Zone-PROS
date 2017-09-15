@@ -3,6 +3,8 @@
 
 
 double liftHeight();
+void setLiftState(liftState state);
+void setChainState(chainState state);
 
 
 //#region autostacking
