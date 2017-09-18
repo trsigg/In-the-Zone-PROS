@@ -66,7 +66,7 @@ void MotorGroup::resetEncoder() {
 
 int MotorGroup::potVal() {
 	if (hasPotentiometer()) {
-		return analogRead(potPort);
+		return potReversed ? 4095-analogRead(potPort) : analogRead(potPort);
 	} else {
 		return 0;	//possible debug location
 	}
@@ -83,8 +83,7 @@ int MotorGroup::getPosition() {
 
 //#region position movement
 void MotorGroup::moveTowardPosition(int pos, char power) {
-	return setPower((potIsDefault && potReversed ? -1 : 1) *
-	                copysign(power, pos-getPosition()));
+	return setPower(copysign(power, pos-getPosition()));
 }
 
 void MotorGroup::stopManeuver() {
@@ -107,15 +106,11 @@ void MotorGroup::executeManeuver() {
 void MotorGroup::goToPosition(int pos, bool runAsManeuver, char endPower, char maneuverPower, unsigned short timeout) {
 	maneuverTarget = pos;
 	endPower = endPower;
+	forward = maneuverTarget > getPosition();
 	maneuverPower = copysign(maneuverPower, (forward ? 1 : -1));
 	maneuverExecuting = true;
 	maneuverTimeout = timeout;
 	maneuverTimer->reset();
-
-	if (potIsDefault && potReversed)
-		forward = maneuverTarget < getPosition();
-	else
-		forward = maneuverTarget > getPosition();
 
 	if (!runAsManeuver) {
 		while (maneuverExecuting) executeManeuver();
@@ -134,8 +129,7 @@ void MotorGroup::setTargetPosition(int position) {
 
 void MotorGroup::maintainTargetPos() {
 	if (targetingActive && posPID) {
-		setPower((potIsDefault && potReversed ? -1 : 1) *
-		         posPID->evaluate(getPosition()));
+		setPower(posPID->evaluate(getPosition()));
 	}
 }
 

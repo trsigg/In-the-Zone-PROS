@@ -20,7 +20,7 @@
   #define MAX_NUM_CONES 11
   //#endsubregion
   //#subregion config
-  #define TESTING 2 //0 for normal behavior, 1 for sensor testing, 2 for test bot
+  #define TESTING 0 //0 for normal behavior, 1 for sensor testing, 2 for test bot
   //#endsubregion
   //#subregion drive
   //motors (mps = motor ports)
