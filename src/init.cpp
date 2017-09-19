@@ -1,4 +1,5 @@
 #include "main.h"
+#include "JINX.h"
 #include "config.h"
 
 extern "C" {
@@ -51,5 +52,12 @@ void initialize() {
   //#region PID config
   lift.posPIDinit(0.3, 0.01, 0.05, 0);
   chainBar.posPIDinit(0.2, 0.001, 0.05, 0);
+  //#endregion
+  //#region JINX config
+  if (TESTING > 0 || DEBUG_LEVEL > 0) {
+    initJINX(uart1/*stdout*/);
+    delay(100);
+    taskCreate(JINXRun, TASK_DEFAULT_STACK_SIZE, NULL, (TASK_PRIORITY_DEFAULT));
+  }
   //#endregion
 }

@@ -1,3 +1,4 @@
+#include "JINX.h"
 #include "config.h"
 #include "buttonTracker.h"
 
@@ -39,40 +40,48 @@ void testSensors() {
   }
 }
 
-void testDerpBot() {
+void testDerpBot(int testLevel) {
   unsigned char lMotors[] = { 10 };
   unsigned char rMotors[] = { 1 };
   unsigned char flMotors[] = { 2 };
   ParallelDrive derpDrive(1, 1, lMotors, rMotors);
   MotorGroup flapper(1, flMotors, 1);
-  int prevPos = 2000;
 
-	while (!joystickGetDigital(QUIT_BTN)) {
-		//flapper.takeInput();
-		flapper.maintainTargetPos();
-		derpDrive.takeInput();
+  if (testLevel == 2) { //test flapper PID positioning
+    int prevPos = 2000;
 
-		if (ButtonTracker::newlyPressed(STORE_POS_BTN)) {
-      drive.setDrivePower(127, 127);
-      delay(100);
-      drive.setDrivePower(0, 0);
+  	while (!joystickGetDigital(QUIT_BTN)) {
+  		//flapper.takeInput();
+  		flapper.maintainTargetPos();
+  		derpDrive.takeInput();
 
-			prevPos = flapper.getPosition();
-			printf("%d", prevPos);
-		}
+  		if (ButtonTracker::newlyPressed(STORE_POS_BTN)) {
+        drive.setDrivePower(127, 127);
+        delay(100);
+        drive.setDrivePower(0, 0);
 
-		if (joystickGetDigital(MAINTAIN_POS_BTN))
-			flapper.setTargetPosition(prevPos);
-	}
+  			prevPos = flapper.getPosition();
+  			printf("%d", prevPos);
+  		}
+
+  		if (joystickGetDigital(MAINTAIN_POS_BTN))
+  			flapper.setTargetPosition(prevPos);
+  	}
+  }
+  else {  //test sensors
+    char potVal[10];  //shouldn't be bigger than 4, but whatever
+
+    while (!joystickGetDigital(QUIT_BTN)) {
+      sprintf(potVal, "%d", flapper.getPosition());
+      writeJINXData("potVal", potVal);
+      delay(1000);
+    }
+  }
 }
 
 void handleTesting() {
-  switch (TESTING) {
-    case 1:
+  if (TESTING == 1)
       testSensors();
-      break;
-    case 2:
-      testDerpBot();
-      break;
-  }
+  if (TESTING <= 3)  //TESTING is 2 or 3
+      testDerpBot(TESTING);
 }
